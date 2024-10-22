@@ -16,21 +16,21 @@ const InfraStack = new AmplifyInfraStack(app, "AmplifyInfraStack", {
   env: { account: "211125505645", region: "us-west-2" },
 });
 
-// creation of amplify application
-const amplifyNextHostingStack = new NextHostingStack(
-  app,
-  "AgenticAssistantAiApp",
-  {
-    githubOAuthToken: 'github-token',
-    owner: "MrF1ow",
-    repository: "agentic-assistant-ai",
-    environmentVariables: {
-      USER_POOL_ID: CognitoStack.userPool.userPoolId,
-      USER_POOL_CLIENT_ID: CognitoStack.userPoolClient.userPoolClientId,
-      API_URL: InfraStack.apiUrl,
-    },
-  }
-);
+// // creation of amplify application
+// const amplifyNextHostingStack = new NextHostingStack(
+//   app,
+//   "AgenticAssistantAiApp",
+//   {
+//     githubOAuthToken: 'github-token',
+//     owner: "MrF1ow",
+//     repository: "agentic-assistant-ai",
+//     environmentVariables: {
+//       USER_POOL_ID: CognitoStack.userPool.userPoolId,
+//       USER_POOL_CLIENT_ID: CognitoStack.userPoolClient.userPoolClientId,
+//       API_URL: InfraStack.apiUrl,
+//     },
+//   }
+// );
 
 /* Uncomment the next line to specialize this stack for the AWS Account
  * and Region that are implied by the current CLI configuration. */
