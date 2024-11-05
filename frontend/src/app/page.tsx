@@ -1,6 +1,6 @@
 
 export default function Chat() {
     return (
-        <div> Hello Work!</div>
+        <div> Hello World! </div>
     )
 }
