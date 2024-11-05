@@ -1,4 +1,5 @@
 import { CfnOutput, SecretValue, Stack, StackProps } from "aws-cdk-lib";
+import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 import * as codebuild from "aws-cdk-lib/aws-codebuild";
 import {
@@ -20,6 +21,22 @@ interface HostingStackProps extends StackProps {
 export class NextHostingStack extends Stack {
   constructor(scope: Construct, id: string, props: HostingStackProps) {
     super(scope, id, props);
+
+    const amplifyRole = new iam.Role(this, "AmplifyExecutionRole", {
+      assumedBy: new iam.ServicePrincipal("amplify.amazonaws.com"),
+      inlinePolicies: {
+        AmplifyPolicy: new iam.PolicyDocument({
+          statements: [
+            new iam.PolicyStatement({
+              actions: ["*"],
+              // actions: ["s3:*", "lambda:*", "cloudwatch:*", "amplify:*", "cognito:*"],
+              resources: ["*"],
+            }),
+          ],
+        }),
+      },
+    });
+
     const amplifyApp = new App(this, "ProductViewer", {
       appName: "AgenticApp",
       sourceCodeProvider: new GitHubSourceCodeProvider({
@@ -28,6 +45,7 @@ export class NextHostingStack extends Stack {
         oauthToken: SecretValue.secretsManager(props.githubOAuthToken),
       }),
       autoBranchDeletion: true,
+      role: amplifyRole,
       customRules: [
         {
           source: "/<*>",
@@ -37,11 +55,11 @@ export class NextHostingStack extends Stack {
       ],
       environmentVariables: props.environmentVariables,
       buildSpec: codebuild.BuildSpec.fromObjectToYaml({
-        version: 1,
+        version: "1.0",
         frontend: {
           phases: {
             preBuild: {
-              commands: ["cd frontend", "npm ci"],
+              commands: ["cd frontend", "npm install"],
             },
             build: {
               commands: ["npm run build"],
