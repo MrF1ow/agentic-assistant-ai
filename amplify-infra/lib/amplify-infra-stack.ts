@@ -18,12 +18,6 @@ export class AmplifyInfraStack extends cdk.Stack {
     // setup repo pipeline later
     // https://aws.amazon.com/blogs/mobile/deploying-a-static-website-with-aws-amplify-and-cdk/
 
-    // initialize Cognito User Pool
-    // const userPoolStack = new CognitoUserStack(this, 'AgenticAssistantAiUserPool');
-
-    // const userPoolId = cdk.Fn.importValue("UserPoolId");
-    // const userPoolClientId = cdk.Fn.importValue("UserPoolClientId");
-
     // initialize API Gateway
     const api = new ApiGateway(this, "AgenticAssistantAiApi", {
       restApiName: "AgenticAssistantAiApi",

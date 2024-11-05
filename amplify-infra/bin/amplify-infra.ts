@@ -8,36 +8,28 @@ import { NextHostingStack } from "../lib/next-hosting-stack";
 
 const app = new cdk.App();
 
-const CognitoStack = new CognitoUserStack(app, "CognitoUserStack", {
-  env: { account: "211125505645", region: "us-west-2" },
-});
+const env = { account: "211125505645", region: "us-west-2" };
 
-const InfraStack = new AmplifyInfraStack(app, "AmplifyInfraStack", {
-  env: { account: "211125505645", region: "us-west-2" },
-});
+const CognitoStack = new CognitoUserStack(app, "CognitoUserStack", { env });
 
-// // creation of amplify application
-// const amplifyNextHostingStack = new NextHostingStack(
-//   app,
-//   "AgenticAssistantAiApp",
-//   {
-//     githubOAuthToken: 'github-token',
-//     owner: "MrF1ow",
-//     repository: "agentic-assistant-ai",
-//     environmentVariables: {
-//       USER_POOL_ID: CognitoStack.userPool.userPoolId,
-//       USER_POOL_CLIENT_ID: CognitoStack.userPoolClient.userPoolClientId,
-//       API_URL: InfraStack.apiUrl,
-//     },
-//   }
-// );
+const InfraStack = new AmplifyInfraStack(app, "AmplifyInfraStack", { env });
 
-/* Uncomment the next line to specialize this stack for the AWS Account
- * and Region that are implied by the current CLI configuration. */
-// env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION },
+// creation of amplify application
+const amplifyNextHostingStack = new NextHostingStack(
+  app,
+  "AgenticAssistantAiApp",
+  {
+    githubOAuthToken: 'github-token',
+    owner: "MrF1ow",
+    repository: "agentic-assistant-ai",
+    environmentVariables: {
+      USER_POOL_ID: CognitoStack.userPool.userPoolId,
+      USER_POOL_CLIENT_ID: CognitoStack.userPoolClient.userPoolClientId,
+      API_URL: InfraStack.apiUrl,
+    },
+    env,
+  }
+);
 
-/* Uncomment the next line if you know exactly what Account and Region you
- * want to deploy the stack to. */
-// env: { account: '123456789012', region: 'us-east-1' },
-
-/* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
+amplifyNextHostingStack.addDependency(CognitoStack);
+amplifyNextHostingStack.addDependency(InfraStack);
