@@ -5,6 +5,7 @@ import {
   signIn,
   signOut,
   resendSignUpCode,
+  autoSignIn,
 } from "aws-amplify/auth";
 import { nanoid } from "nanoid";
 import { getErrorMessage } from "@/utils/get-error-message";
@@ -65,6 +66,7 @@ export async function handleConfirmSignUp(
       username: String(formData.get("email")),
       confirmationCode: String(formData.get("code")),
     });
+    // autoSignIn();
   } catch (error) {
     console.error(error);
     return getErrorMessage(error);
