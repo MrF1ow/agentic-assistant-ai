@@ -1,13 +1,18 @@
 // Package Imports
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
+import {
+  Role,
+  ServicePrincipal,
+  PolicyStatement,
+  ManagedPolicy,
+} from "aws-cdk-lib/aws-iam";
 
 // Local Imports
-import { CognitoUserStack } from "./cognito-user-stack";
 import { ApiGateway } from "./ApiGateway";
-import { S3Bucket } from "./S3Bucket";
 import { Dynamo } from "./Dynamo";
 import { Lambda } from "./Lambda";
+import { S3Bucket } from "./S3Bucket";
 
 export class AmplifyInfraStack extends cdk.Stack {
   public readonly apiUrl: string;
@@ -15,8 +20,45 @@ export class AmplifyInfraStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // setup repo pipeline later
-    // https://aws.amazon.com/blogs/mobile/deploying-a-static-website-with-aws-amplify-and-cdk/
+    // initialize the DynamoDB table for storing chat conversations
+    const conversationsTable = new Dynamo(
+      this,
+      "ConversationsTable",
+      "conversations",
+      "chatId"
+    );
+
+    // create a lambda execution role with permissions to read from the DynamoDB table
+    const conversationLambdaRole = new Role(this, "LambdaDynamoDBRole", {
+      assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
+      managedPolicies: [
+        ManagedPolicy.fromAwsManagedPolicyName(
+          "service-role/AWSLambdaBasicExecutionRole"
+        ),
+      ],
+    });
+
+    conversationLambdaRole.addToPolicy(
+      new PolicyStatement({
+        actions: ["dynamodb:Query", "dynamodb:GetItem", "dynamodb:Scan"],
+        // restrict access to the conversations ONLY
+        resources: [conversationsTable.tableArn],
+      })
+    );
+
+    // create a lambda function to retrieve the chat histories from the DynamoDB table
+    const getConversationsLambda = new Lambda(
+      this,
+      "GetConversationsLambda",
+      "getConversations",
+      conversationLambdaRole
+    );
+    conversationsTable.grantReadData(getConversationsLambda);
+
+    getConversationsLambda.addEnvironment(
+      "CONVERSATIONS_TABLE_NAME",
+      conversationsTable.tableName
+    );
 
     // initialize API Gateway
     const api = new ApiGateway(this, "AgenticAssistantAiApi", {
@@ -31,6 +73,8 @@ export class AmplifyInfraStack extends cdk.Stack {
         stageName: "dev",
       },
     });
+
+    api.addIntegration("GET", "conversations", getConversationsLambda);
 
     this.apiUrl = api.url;
   }
