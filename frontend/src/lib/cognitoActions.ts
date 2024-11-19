@@ -62,7 +62,7 @@ export async function handleConfirmSignUp(
   formData: FormData
 ) {
   try {
-    const { isSignUpComplete, userId, nextStep } = await confirmSignUp({
+    const { isSignUpComplete, nextStep } = await confirmSignUp({
       username: String(formData.get("email")),
       confirmationCode: String(formData.get("code")),
     });

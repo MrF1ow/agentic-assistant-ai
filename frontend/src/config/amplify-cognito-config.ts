@@ -9,7 +9,7 @@ export const authConfig: ResourcesConfig["Auth"] = {
   },
 };
 
-Amplify.configure({ Auth: authConfig }, { ssr: true });
+Amplify.configure({ Auth: authConfig });
 
 export default function ConfigureAmplifyClientSide() {
   return null;
