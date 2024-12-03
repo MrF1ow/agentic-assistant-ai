@@ -25,7 +25,8 @@
     ]
   },
   "include": [
-    "lambda/**/*.ts"
+    "lambda/**/*.ts",
+    "lib/**/*.ts",
   ],
   "exclude": [
     "node_modules",

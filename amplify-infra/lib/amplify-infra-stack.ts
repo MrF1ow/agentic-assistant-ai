@@ -40,10 +40,23 @@ export class AmplifyInfraStack extends cdk.Stack {
 
     conversationLambdaRole.addToPolicy(
       new PolicyStatement({
-        actions: ["dynamodb:Query", "dynamodb:GetItem", "dynamodb:Scan"],
+        actions: [
+          "dynamodb:Query",
+          "dynamodb:GetItem",
+          "dynamodb:Scan",
+          "bedrock:InvokeModel",
+          "bedrock:ListModels",
+        ],
         // restrict access to the conversations ONLY
-        resources: [conversationsTable.tableArn],
+        resources: [conversationsTable.tableArn, "*"],
       })
+    );
+
+    const bedrockLambda = new Lambda(
+      this,
+      "BedrockInteractionLambda",
+      "interactWithBedrock",
+      conversationLambdaRole
     );
 
     // create a lambda function to retrieve the chat histories from the DynamoDB table
@@ -58,6 +71,11 @@ export class AmplifyInfraStack extends cdk.Stack {
     getConversationsLambda.addEnvironment(
       "CONVERSATIONS_TABLE_NAME",
       conversationsTable.tableName
+    );
+
+    bedrockLambda.addEnvironment(
+      "BEDROCK_ENDPOINT",
+      "bedrock-runtime.amazonaws.com"
     );
 
     // initialize API Gateway
@@ -75,6 +93,7 @@ export class AmplifyInfraStack extends cdk.Stack {
     });
 
     api.addIntegration("GET", "conversations", getConversationsLambda);
+    api.addIntegration("POST", "bedrock", bedrockLambda);
 
     this.apiUrl = api.url;
   }
