@@ -3,7 +3,7 @@ import { DynamoDB } from "aws-sdk";
 const dynamoDb = new DynamoDB.DocumentClient();
 const tableName = process.env.CONVERSATIONS_TABLE_NAME || "";
 
-export const handler = async (event: any) => {
+exports.handler = async (event: any) => {
   try {
     const params = {
       TableName: tableName,
