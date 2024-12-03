@@ -1,3 +1,4 @@
+import { Providers } from "@/providers/default";
 import type { Metadata } from "next";
 import ConfigureAmplifyClientSide from "@/config/amplify-cognito-config";
 import "./globals.css";
@@ -14,10 +15,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased">
-        <ConfigureAmplifyClientSide />
-        {children}
-      </body>
+      <Providers>
+        <body className="font-sans antialiased w-screen h-screen">
+          <ConfigureAmplifyClientSide />
+          {children}
+        </body>
+      </Providers>
     </html>
   );
 }

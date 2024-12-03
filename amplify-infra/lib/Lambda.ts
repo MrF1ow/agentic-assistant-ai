@@ -2,19 +2,18 @@ import {
   Runtime,
   Code,
   Function,
-  StartingPosition,
 } from "aws-cdk-lib/aws-lambda";
 import { IRole } from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 import { Duration } from "aws-cdk-lib";
-import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
+// import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 
 /*
  * Lambda class
  * @class
  * @classdesc This class extends the Function class from the aws-cdk-lib/aws-lambda module
  * */
-export class Lambda extends NodejsFunction {
+export class Lambda extends Function {
   /*
    * Lambda constructor
    * @constructor
@@ -31,13 +30,7 @@ export class Lambda extends NodejsFunction {
       code: Code.fromAsset("lambda"),
       functionName: functionName,
       role: role,
-      timeout: Duration.seconds(60),
-      bundling: {
-        minify: true,
-        target: "node20",
-        nodeModules: ["aws-sdk"],
-        externalModules: [],
-      },
+      timeout: Duration.seconds(300),
     };
 
     super(scope, id, lambdaProps);

@@ -6,7 +6,7 @@ exports.handler = async (event: any) => {
   const requestBody = JSON.parse(event.body);
 
   const params = {
-    modelId: "meta.llama3-1-405b-instruct-v1:0",
+    modelId: "meta.llama3-8b-instruct-v1:0",
     body: JSON.stringify({
       prompt: requestBody.prompt,
       max_gen_len: requestBody.max_gen_len,
@@ -14,6 +14,7 @@ exports.handler = async (event: any) => {
       top_p: requestBody.top_p,
     }),
     contentType: "application/json",
+    accept: "application/json",
   };
 
   try {
